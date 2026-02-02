@@ -1,0 +1,49 @@
+# General
+*.log
+*.tmp
+*.temp
+*.bak
+*~
+*.swp
+.DS_Store
+Thumbs.db
+
+# Build directories (Meson / common)
+/build/
+/build-*/
+meson-private/
+meson-logs/
+meson-info/
+
+# Compiled objects and libraries
+*.o
+*.obj
+*.so
+*.dylib
+*.a
+*.lib
+*.exe
+*.elf
+
+# C/C++ IDE / editor files
+.vscode/
+.idea/
+*.code-workspace
+*.sublime-project
+*.sublime-workspace
+
+
+
+# Distribution / packaging
+dist/
+*.egg-info/
+pip-wheel-metadata/
+
+# Misc
+*.pem
+*.key
+*.lock
+
+# Logs and crash dumps
+*.stackdump
+crash.log
