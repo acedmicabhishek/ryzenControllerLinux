@@ -35,7 +35,8 @@ ryzen_helper = executable('ryzen_helper',
 ryzen_sources = [
     'ryzen_plugin.cpp',
     'backend/ryzen_adj_wrapper.cpp',
-    'ui/ryzen_page.cpp'
+    'ui/ryzen_page.cpp',
+    'backend/config.cpp'
 ]
 
 # Include Path to Core (Now Local)

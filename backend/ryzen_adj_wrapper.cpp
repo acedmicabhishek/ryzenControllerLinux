@@ -7,6 +7,8 @@
 #include <memory>
 #include <array>
 
+#include "config.h"
+
 #ifndef RYZEN_HELPER_PATH
 #define RYZEN_HELPER_PATH "/usr/local/libexec/kerneldrive/ryzen_helper"
 #endif
@@ -57,8 +59,25 @@ namespace {
     }
 }
 
-bool RyzenAdjWrapper::is_supported() {
 
+void RyzenAdjWrapper::init() {
+    RyzenConfig::init();
+    
+    int stapm = RyzenConfig::get_int("StapmLimit", -1);
+    if (stapm != -1) {
+         int fast = RyzenConfig::get_int("FastLimit", 0);
+         int slow = RyzenConfig::get_int("SlowLimit", 0);
+         int stapm_time = RyzenConfig::get_int("StapmTime", 0);
+         int slow_time = RyzenConfig::get_int("SlowTime", 0);
+         int temp = RyzenConfig::get_int("TempLimit", 0);
+         int co = RyzenConfig::get_int("CO", 0);
+         
+         std::cout << "[RyzenAdj] Auto-applying saved settings..." << std::endl;
+         apply_limits(stapm, fast, slow, stapm_time, slow_time, temp, co);
+    }
+}
+
+bool RyzenAdjWrapper::is_supported() {
     return true; 
 }
 

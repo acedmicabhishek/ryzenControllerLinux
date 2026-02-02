@@ -1,8 +1,6 @@
 #include "ryzen_page.h"
 #include "../backend/ryzen_adj_wrapper.h"
-
-#include "ryzen_page.h"
-#include "../backend/ryzen_adj_wrapper.h"
+#include "../backend/config.h"
 
 struct RyzenData {
     GtkWidget* stapm_spin;
@@ -15,6 +13,8 @@ struct RyzenData {
 };
 
 GtkWidget* RyzenPage::create() {
+    RyzenConfig::init();
+
     GtkWidget* page = adw_preferences_page_new();
     
     GtkWidget* power_group = adw_preferences_group_new();
@@ -35,9 +35,9 @@ GtkWidget* RyzenPage::create() {
         *out_spin = spin;
     };
 
-    create_row("STAPM Limit (Sustained)", 5, 100, 1, 35, &data->stapm_spin);
-    create_row("Fast PPT Limit (Short Boost)", 5, 100, 1, 50, &data->fast_spin);
-    create_row("Slow PPT Limit (Long Boost)", 5, 100, 1, 45, &data->slow_spin);
+    create_row("STAPM Limit (Sustained)", 5, 100, 1, RyzenConfig::get_int("StapmLimit", 35), &data->stapm_spin);
+    create_row("Fast PPT Limit (Short Boost)", 5, 100, 1, RyzenConfig::get_int("FastLimit", 50), &data->fast_spin);
+    create_row("Slow PPT Limit (Long Boost)", 5, 100, 1, RyzenConfig::get_int("SlowLimit", 45), &data->slow_spin);
     
     adw_preferences_page_add(ADW_PREFERENCES_PAGE(page), ADW_PREFERENCES_GROUP(power_group));
 
@@ -55,8 +55,8 @@ GtkWidget* RyzenPage::create() {
         *out_spin = spin;
     };
     
-    create_time_row("Slow PPT Time", 1, 128, 1, 5, &data->slow_time_spin);
-    create_time_row("STAPM Time", 1, 1000, 10, 60, &data->stapm_time_spin);
+    create_time_row("Slow PPT Time", 1, 128, 1, RyzenConfig::get_int("SlowTime", 5), &data->slow_time_spin);
+    create_time_row("STAPM Time", 1, 1000, 10, RyzenConfig::get_int("StapmTime", 60), &data->stapm_time_spin);
     
     adw_preferences_page_add(ADW_PREFERENCES_PAGE(page), ADW_PREFERENCES_GROUP(time_group));
 
@@ -66,7 +66,7 @@ GtkWidget* RyzenPage::create() {
     GtkWidget* temp_row = adw_action_row_new();
     adw_preferences_row_set_title(ADW_PREFERENCES_ROW(temp_row), "Temp Limit (°C)");
     GtkWidget* temp_spin = gtk_spin_button_new_with_range(45, 100, 1);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(temp_spin), 95);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(temp_spin), RyzenConfig::get_int("TempLimit", 95));
     gtk_widget_set_valign(temp_spin, GTK_ALIGN_CENTER);
     adw_action_row_add_suffix(ADW_ACTION_ROW(temp_row), temp_spin);
     adw_preferences_group_add(ADW_PREFERENCES_GROUP(adv_group), temp_row);
@@ -76,7 +76,7 @@ GtkWidget* RyzenPage::create() {
     adw_preferences_row_set_title(ADW_PREFERENCES_ROW(co_row), "UnderVolting");
     adw_action_row_set_subtitle(ADW_ACTION_ROW(co_row), "Negative Offset (All Core). Risk of instability!");
     GtkWidget* co_spin = gtk_spin_button_new_with_range(-30, 0, 1);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(co_spin), 0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(co_spin), RyzenConfig::get_int("CO", 0));
     gtk_widget_set_valign(co_spin, GTK_ALIGN_CENTER);
     adw_action_row_add_suffix(ADW_ACTION_ROW(co_row), co_spin);
     adw_preferences_group_add(ADW_PREFERENCES_GROUP(adv_group), co_row);
@@ -108,7 +108,16 @@ GtkWidget* RyzenPage::create() {
         int co = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(d->co_spin));
         
         RyzenAdjWrapper::apply_limits(stapm, fast, slow, stapm_time, slow_time, temp, co);
-      
+
+        // Save Rice 🍚
+        RyzenConfig::set_int("StapmLimit", stapm);
+        RyzenConfig::set_int("FastLimit", fast);
+        RyzenConfig::set_int("SlowLimit", slow);
+        RyzenConfig::set_int("StapmTime", stapm_time);
+        RyzenConfig::set_int("SlowTime", slow_time);
+        RyzenConfig::set_int("TempLimit", temp);
+        RyzenConfig::set_int("CO", co);
+        
     }), data);
     
     return page;

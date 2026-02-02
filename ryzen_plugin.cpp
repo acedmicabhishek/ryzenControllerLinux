@@ -1,8 +1,10 @@
 #include "ryzen_plugin.h"
 #include "ui/ryzen_page.h"
 #include <iostream>
+#include "backend/ryzen_adj_wrapper.h"
 
 bool RyzenPlugin::init() {
+    RyzenAdjWrapper::init();
     std::cout << "[RyzenPlugin] Initialized." << std::endl;
     return true;
 }
